@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Team Purple AI Interviewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; background-color: #f4f4f4; }
+    h1 { color: #4b0082; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+    #log { margin-top: 20px; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    img.logo { max-width: 200px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="Company Logo" class="logo" />
+  <h1>🎙️ Team Purple AI Interviewer</h1>
+  <p>Click the button below to start your voice interview.</p>
+  <button onclick="startInterview()">Start Interview</button>
+  <div id="log"></div>
+
+  <script>
+    const questions = [
+      "Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.",
+      "1. Tell me about yourself.",
+      "2. Explain your educational background.",
+      "3. What are your weaknesses and strengths?",
+      "4. Describe your experience with object-oriented programming.",
+      "5. How would you optimize low-performing SQL code?",
+      "6. Explain the purpose of a firewall.",
+      "7. How do you approach troubleshooting a crashing program?",
+      "8. Explain the Software Development Life Cycle and its uses.",
+      "9. Explain the concept of horizontal scaling and its benefits.",
+      "10. Why should I hire you?"
+    ];
+
+    let currentQuestion = 0;
+    const log = document.getElementById("log");
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+
+    function listen(callback) {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+
+      let stopped = false;
+
+      // ⏳ Auto stop after 5 minutes (300000 ms)
+      const timeout = setTimeout(() => {
+        if (!stopped) {
+          recognition.stop();
+          stopped = true;
+          callback("No response (timed out)");
+        }
+      }, 300000); // 5 minutes
+
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        clearTimeout(timeout);
+        if (!stopped) {
+          const result = event.results[0][0].transcript;
+          stopped = true;
+          recognition.stop();
+          callback(result);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        clearTimeout(timeout);
+        if (!stopped) {
+          stopped = true;
+          callback("Error: " + event.error);
+        }
+      };
+    }
+
+    function askQuestion() {
+      if (currentQuestion >= questions.length) {
+        log.innerHTML += `<p><strong>Interview complete!</strong></p>`;
+        return;
+      }
+
+      const question = questions[currentQuestion];
+      speak(question);
+      log.innerHTML += `<p><strong>Q:</strong> ${question}</p>`;
+
+      listen((answer) => {
+        log.innerHTML += `<p><strong>A:</strong> ${answer}</p>`;
+        currentQuestion++;
+        setTimeout(askQuestion, 2000);
+      });
+    }
+
+    function startInterview() {
+      currentQuestion = 0;
+      askQuestion();
+    }
+  </script>
+</body>
+</html>
