@@ -6,7 +6,7 @@
     body {
       font-family: Arial, sans-serif;
       padding: 30px;
-      background-color: #f4f4f4;
+      background: linear-gradient(to right, #f0f4ff, #e0e7ff);
     }
     h1 {
       color: #4b0082;
@@ -15,57 +15,69 @@
       padding: 10px 20px;
       font-size: 16px;
       margin-top: 20px;
+      cursor: pointer;
     }
     #log {
       margin-top: 20px;
       background: #fff;
       padding: 15px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    img.logo {
+    .logo {
       max-width: 200px;
       margin-bottom: 20px;
     }
     video {
       margin-top: 20px;
+      width: 320px;
+      border: 2px solid #4b0082;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
   <img src="logo.png" alt="Company Logo" class="logo" />
-  <h1>🧠 Team Purple AI Interviewer</h1>
-  <p>Click the button below to start your voice interview.</p>
+  <h1>🎤 Team Purple AI Interviewer</h1>
+  <p>Click below to begin your AI video interview.</p>
   <button onclick="startInterview()">Start Interview</button>
-
   <div id="log"></div>
-
-  <!-- 📸 Webcam preview -->
-  <video id="webcam" autoplay playsinline width="320" height="240" muted></video>
-
-  <!-- ⏺️ Download link -->
-  <a id="downloadLink" style="display:none;" download="interview_recording.webm">Download Recording</a>
+  <video id="webcam" autoplay muted></video>
 
   <script>
     const questions = [
-      "Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.",
+      "Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by re-interviews due to an emergency. Let's start.",
       "Tell me about yourself.",
-      "What are your strengths and weaknesses?",
-      "Describe a challenging technical problem you solved recently.",
+      "What are your core technical strengths?",
+      "Describe a challenging problem you solved recently.",
       "Where do you see yourself in 5 years?",
-      "Thank you for your time. We'll get back to you soon!"
+      "Thanks! That concludes the interview."
     ];
 
-    let currentQuestion = 0;
-    let mediaRecorder;
-    let recordedChunks = [];
+    let current = 0;
+    const log = document.getElementById('log');
 
     function speak(text) {
+      const synth = window.speechSynthesis;
       const utterance = new SpeechSynthesisUtterance(text);
-      speechSynthesis.speak(utterance);
+      synth.speak(utterance);
     }
+
+    function askQuestion() {
+      if (current < questions.length) {
+        const question = questions[current];
+        speak(question);
+        log.innerHTML += `<p><strong>Q:</strong> ${question}</p>`;
+        current++;
+        setTimeout(askQuestion, 60000); // wait 60s per answer
+      } else {
+        stopRecording();
+        log.innerHTML += `<p><strong>✅ Interview complete.</strong></p>`;
+      }
+    }
+
+    let mediaRecorder;
+    let recordedChunks = [];
 
     async function startInterview() {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -73,43 +85,28 @@
 
       recordedChunks = [];
       mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = (e) => {
+      mediaRecorder.ondataavailable = e => {
         if (e.data.size > 0) recordedChunks.push(e.data);
       };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const downloadLink = document.getElementById('downloadLink');
-        downloadLink.href = url;
-        downloadLink.style.display = 'inline';
-      };
-
+      mediaRecorder.onstop = saveRecording;
       mediaRecorder.start();
 
-      askNextQuestion();
+      askQuestion();
     }
 
-    function askNextQuestion() {
-      if (currentQuestion >= questions.length) {
-        document.getElementById('log').innerHTML += "<p>✅ Interview completed. Thank you!</p>";
-        stopInterview();
-        return;
-      }
-
-      const question = questions[currentQuestion];
-      speak(question);
-      document.getElementById('log').innerHTML += `<p><strong>Q:</strong> ${question}</p>`;
-      currentQuestion++;
-      
-      setTimeout(askNextQuestion, 6000); // Wait ~6 seconds per question
-    }
-
-    function stopInterview() {
-      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
       }
+    }
+
+    function saveRecording() {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'interview_recording.webm';
+      a.click();
     }
   </script>
 </body>
