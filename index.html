@@ -1,143 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Team Purple AI Interviewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to bottom right, #1e1e2f, #2e014d);
-      color: #fff;
+      background: linear-gradient(135deg, #2c003e, #1a0026);
+      color: #f5f5f5;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      background: #1c1c2c;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 700px;
-      width: 100%;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
       text-align: center;
     }
-    .logo {
-      max-width: 120px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #ffcc00;
-      font-size: 28px;
+    .container {
+      background: #00000080;
+      border-radius: 2rem;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
     }
     button {
-      background-color: #4b0082;
-      color: #fff;
-      padding: 12px 24px;
-      font-size: 16px;
-      margin: 10px;
+      padding: 1rem 2rem;
+      background-color: #d4af37;
+      color: #1a0026;
       border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      border-radius: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
       cursor: pointer;
+      margin-top: 1rem;
+      box-shadow: 0 0 10px #d4af37;
     }
     button:hover {
-      background-color: #372061;
+      background-color: #ffd700;
     }
-    .instructions {
-      margin: 20px 0;
-      font-size: 14px;
-      color: #ccc;
+    #timer {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      color: #ffd700;
     }
-    #log {
-      margin-top: 20px;
-      background: #2b2b3c;
-      border-radius: 12px;
-      padding: 20px;
+    #log p {
       text-align: left;
+      margin: 0.5rem 0;
     }
-    video {
-      margin-top: 20px;
-      width: 100%;
-      border-radius: 12px;
+    img.logo {
+      width: 100px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" class="logo" alt="Company Logo">
-    <h1>🌙 Team Purple AI Interviewer</h1>
-    <p class="instructions">
-      Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency.<br>
-      Please ensure your camera and microphone are enabled. You will have 5 minutes to answer each question. Let's begin!
-    </p>
+    <img src="logo.png" alt="Company Logo" class="logo">
+    <h2>Team Purple AI Interviewer</h2>
+    <p><strong>Instructions:</strong> This interview will be conducted by an AI. Each question will be spoken aloud. You have 5 minutes per question to respond. Your video and audio will be recorded. Please stay in front of the camera throughout the session.</p>
     <button onclick="startInterview()">Start Interview</button>
+    <div id="timer"></div>
     <div id="log"></div>
-    <video id="preview" autoplay muted></video>
   </div>
 
   <script>
     const questions = [
-      "1. Tell me about yourself.",
-      "2. Explain your educational background.",
-      "3. What are your weaknesses and strengths?",
-      "4. Describe your experience with object-oriented programming.",
-      "5. How would you optimize low-performing SQL code?",
-      "6. Explain the purpose of a firewall.",
-      "7. How do you approach troubleshooting a crashing program?",
-      "8. Explain SDLC and its uses.",
-      "9. Explain the concept of horizontal scaling and its benefits.",
-      "10. Why should I hire you?"
+      "Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking reinterviews as of emergency. Let's start the interview.",
+      "1. Tell me about yourself",
+      "2. Explain your educational background",
+      "3. What are your weakness and strengths",
+      "4. Describe your experience with object-oriented programming",
+      "5. How would you optimize low performing SQL code",
+      "6. Explain the purpose of a firewall",
+      "7. How do you approach troubleshooting a crashing program",
+      "8. Explain SDLC and its uses",
+      "9. Explain the concept of horizontal scaling and its benefits",
+      "10. Why should I hire you"
     ];
 
-    let current = 0;
+    let currentQuestion = 0;
     let mediaRecorder;
-    let videoStream;
-    let chunks = [];
+    let recordedChunks = [];
 
     async function startInterview() {
-      const log = document.getElementById('log');
-      log.innerHTML = '';
+      document.querySelector("button").style.display = "none";
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      mediaRecorder = new MediaRecorder(stream);
 
-      // Start webcam
-      videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      document.getElementById('preview').srcObject = videoStream;
-
-      // Start recorder
-      mediaRecorder = new MediaRecorder(videoStream);
-      mediaRecorder.ondataavailable = e => chunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'interview-recording.webm';
-        a.click();
-      };
+      mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
+      mediaRecorder.onstop = saveRecording;
       mediaRecorder.start();
 
-      askNext();
+      askQuestion();
     }
 
-    function askNext() {
-      const log = document.getElementById('log');
-      if (current >= questions.length) {
+    function askQuestion() {
+      if (currentQuestion >= questions.length) {
         mediaRecorder.stop();
-        videoStream.getTracks().forEach(track => track.stop());
-        log.innerHTML += `<p><strong>Interview complete. Thank you!</strong></p>`;
+        document.getElementById("log").innerHTML += "<p><strong>✅ Interview completed.</strong></p>";
         return;
       }
+      const q = questions[currentQuestion];
+      document.getElementById("log").innerHTML += `<p><strong>Q:</strong> ${q}</p>`;
+      speakText(q);
+      startTimer(300, () => {
+        currentQuestion++;
+        askQuestion();
+      });
+    }
 
-      const question = questions[current];
-      log.innerHTML += `<p><strong>Q${current + 1}:</strong> ${question}</p>`;
-      current++;
+    function speakText(text) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      synth.speak(utterance);
+    }
 
-      setTimeout(askNext, 300000); // 5 minutes = 300000 ms
+    function startTimer(seconds, callback) {
+      const timerDisplay = document.getElementById("timer");
+      let remaining = seconds;
+      timerDisplay.textContent = `⏳ ${remaining} seconds left`;
+      const interval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = `⏳ ${remaining} seconds left`;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          callback();
+        }
+      }, 1000);
+    }
+
+    function saveRecording() {
+      const blob = new Blob(recordedChunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "interview_recording.webm";
+      a.click();
     }
   </script>
 </body>
