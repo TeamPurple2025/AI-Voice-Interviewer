@@ -2,65 +2,145 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Team Purple AI Interviewer</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #0f0f23;
+      color: #fcd53f;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 2rem;
+      background: #1c1c3b;
+      border-radius: 20px;
+      box-shadow: 0 0 15px #fcd53f33;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #fcd53f;
+    }
+    label {
+      display: block;
+      margin: 1rem 0 0.3rem;
+      color: #fff;
+      text-align: left;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 2rem;
+      background: #fcd53f;
+      color: #1c1c3b;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ffeb60;
+    }
+    .logo {
+      width: 100px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="Company Logo" class="logo" />
-    <div class="card">
-      <div id="form-section">
-        <h1>Welcome to Team Purple Interview</h1>
-        <form id="candidate-form">
-          <input type="text" id="candidateName" placeholder="Your Full Name" required>
-          <input type="email" id="candidateEmail" placeholder="Your Email" required>
-          <input type="tel" id="candidatePhone" placeholder="Your Phone Number" required>
-          <input type="file" id="resumeUpload" accept=".pdf,.doc,.docx" required>
-          <label>Select Interview Slot:</label>
-          <select id="interviewSlot" required>
-            <option value="">--Select a Slot--</option>
-            <option value="slot1">10:00 AM - 10:30 AM</option>
-            <option value="slot2">11:00 AM - 11:30 AM</option>
-            <option value="slot3">02:00 PM - 02:30 PM</option>
-          </select>
-          <button type="submit" class="btn">Continue</button>
-        </form>
-      </div>
+    <img src="logo.png" alt="Team Purple Logo" class="logo" />
+    <h1>Team Purple AI Interviewer</h1>
 
-      <div id="instructions" style="display:none">
-        <h2>Interview Instructions</h2>
-        <ul>
-          <li>Use a laptop/desktop with webcam and mic.</li>
-          <li>Be in a quiet, well-lit room alone.</li>
-          <li>Do not use phones, earphones, or external help.</li>
-          <li>Cheating or switching tabs leads to disqualification.</li>
-          <li>AI monitors voice, face & activity.</li>
-          <li>Ensure mic works and net connection is stable.</li>
-        </ul>
-        <p>You will receive the interview link by email. Finish within deadline.</p>
-        <p>If you face issues, reply to our email. Good luck!</p>
-        <p><strong>Warm regards,<br>Team Purple<br>Recruitment Team</strong></p>
-        <button id="startInterview" class="btn">Start Interview</button>
-      </div>
+    <form id="startForm">
+      <label for="name">Candidate Name:</label>
+      <input type="text" id="name" required>
 
-      <div id="countdown" style="display:none">
-        <h2>Interview begins in <span id="count">3</span>...</h2>
-      </div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
 
-      <div id="interview" style="display:none">
-        <h2 id="greeting"></h2>
-        <div id="questionContainer"></div>
-        <video id="preview" autoplay muted></video>
-        <button id="startRecording" class="btn">Start Answer</button>
-        <div id="timer">05:00</div>
-      </div>
-    </div>
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" required>
+
+      <label for="resume">Upload Resume (PDF only):</label>
+      <input type="file" id="resume" accept=".pdf" required>
+
+      <label for="slot">Select Interview Slot:</label>
+      <select id="slot" required>
+        <option value="">-- Choose Slot --</option>
+        <option value="slot1">10:00 AM - 10:30 AM</option>
+        <option value="slot2">11:00 AM - 11:30 AM</option>
+        <option value="now">Continue Now</option>
+      </select>
+
+      <button type="submit">Continue to Instructions</button>
+    </form>
   </div>
 
-  <script src="main.js"></script>
+  <script>
+    const form = document.getElementById('startForm');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const token = new URLSearchParams(window.location.search).get("token");
+      if (!token || !validateToken(token)) {
+        alert("Invalid or expired access token. Please use your interview link.");
+        return;
+      }
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const slot = document.getElementById('slot').value;
+      const resume = document.getElementById('resume').files[0];
+
+      if (!resume.name.endsWith(".pdf")) {
+        alert("Please upload a PDF resume.");
+        return;
+      }
+
+      const candidateData = {
+        name, email, phone, slot,
+        resumeName: resume.name
+      };
+
+      localStorage.setItem("candidateInfo", JSON.stringify(candidateData));
+
+      const reader = new FileReader();
+      reader.onload = function() {
+        localStorage.setItem("resumeData", reader.result);
+        window.location.href = "interview.html?token=" + token;
+      };
+      reader.readAsDataURL(resume);
+    });
+
+    function validateToken(token) {
+      const validTokens = ["abc123", "xyz456", "purple789"]; // Replace with actual tokens or pull from Firebase
+      const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
+
+      if (!validTokens.includes(token) || usedTokens.includes(token)) {
+        return false;
+      }
+
+      usedTokens.push(token);
+      localStorage.setItem("usedTokens", JSON.stringify(usedTokens));
+      return true;
+    }
+  </script>
 </body>
 </html>
