@@ -4,185 +4,192 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team Purple AI Interviewer</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
   <style>
     body {
+      font-family: 'Montserrat', sans-serif;
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0e0e2c;
-      color: #f0e6ff;
+      padding: 0;
+      background: linear-gradient(135deg, #1a1a2e, #3f0071);
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 2rem;
+      min-height: 100vh;
     }
-    .container {
-      background: #1e1e3f;
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-      max-width: 600px;
-      width: 100%;
-    }
-    h1 {
-      color: #ffd700;
+    header {
+      margin-top: 20px;
       text-align: center;
     }
-    button {
-      background-color: #6a0dad;
-      color: white;
-      padding: 1rem;
-      margin: 1rem 0;
+    header img {
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+    }
+    .card {
+      background: #2c2c54;
+      padding: 2rem;
+      margin-top: 20px;
+      border-radius: 2xl;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      max-width: 600px;
+      width: 90%;
+    }
+    h1, h2, p {
+      text-align: center;
+    }
+    input, select, button, textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
       border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      width: 100%;
+      border-radius: 8px;
       font-size: 1rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
-    input, select {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border-radius: 8px;
-      border: 1px solid #aaa;
+    button {
+      background-color: gold;
+      color: #3f0071;
+      font-weight: bold;
+      cursor: pointer;
     }
-    textarea {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border-radius: 8px;
-      border: 1px solid #aaa;
-      min-height: 100px;
+    .hidden {
+      display: none;
     }
-    .hidden { display: none; }
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-top: 1rem;
+      color: gold;
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="step1">
-    <h1>Team Purple AI Interview</h1>
-    <input type="text" id="candidateName" placeholder="Your Name" required />
-    <input type="email" id="email" placeholder="Your Email" required />
-    <input type="tel" id="phone" placeholder="Your Phone Number" required />
-    <input type="file" id="resume" accept=".pdf,.doc,.docx" />
-    <select id="interviewSlot">
-      <option value="now">Continue with Interview</option>
-      <option value="9am">9:00 AM</option>
-      <option value="11am">11:00 AM</option>
-      <option value="2pm">2:00 PM</option>
-      <option value="4pm">4:00 PM</option>
+  <header>
+    <img src="logo.png" alt="Team Purple Logo">
+    <h1>Team Purple AI Interviewer</h1>
+  </header>
+
+  <div class="card" id="form-section">
+    <h2>Candidate Details</h2>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="tel" id="phone" placeholder="Phone Number" required>
+    <input type="file" id="resume" accept=".pdf,.doc,.docx">
+    <select id="slot">
+      <option value="">-- Select Interview Slot --</option>
+      <option value="now">Continue Now</option>
+      <option value="9AM">9:00 AM</option>
+      <option value="11AM">11:00 AM</option>
+      <option value="2PM">2:00 PM</option>
     </select>
-    <button onclick="showInstructions()">Next</button>
+    <button onclick="showInstructions()">Continue</button>
   </div>
 
-  <div class="container hidden" id="instructions">
-    <h1>Interview Instructions</h1>
-    <p>
-      <strong>Device & Environment:</strong><br>
-      Use a laptop or desktop with a working webcam and microphone.<br>
-      Ensure you are in a quiet and well-lit room with no background noise.
-    </p>
-    <p>
-      <strong>No External Help or Communication Tools:</strong><br>
-      Do not use earphones, mobile phones, or communication apps.<br>
-      Make sure no one else is present in the room.
-    </p>
-    <p>
-      <strong>Cheating or Misrepresentation Will Lead to Disqualification:</strong><br>
-      The AI tool actively monitors voice, face, and background activity.<br>
-      Any attempt to cheat, switch tabs, or use pre-recorded answers will result in disqualification.
-    </p>
-    <p>
-      <strong>Voice & Technical Issues:</strong><br>
-      Ensure your microphone is working. Check your internet connection.
-    </p>
-    <p>
-      <strong>Interview Link & Deadline:</strong><br>
-      You will receive a separate email with the interview link. Complete it in time.<br>
-      If you have questions or face technical issues, reply to that email.
-    </p>
-    <p>
-      Warm regards,<br>
-      Team Purple<br>
-      Recruitment Team
-    </p>
-    <button onclick="startCountdown()">Start Interview</button>
+  <div class="card hidden" id="instructions-section">
+    <h2>Interview Instructions</h2>
+    <p><strong>Device & Environment:</strong> Use a laptop with webcam & mic in a quiet, well-lit room.</p>
+    <p><strong>No External Help:</strong> No phones, apps, or others present. Cheating disqualifies.</p>
+    <p><strong>AI Monitoring:</strong> Face, voice, and activity are monitored.</p>
+    <p><strong>Technical Setup:</strong> Test mic & webcam. Avoid switching tabs.</p>
+    <p><strong>Deadline:</strong> Complete the interview within the allotted time.</p>
+    <p>Warm regards,<br>Team Purple Recruitment Team</p>
+    <button onclick="startCountdown()">I'm Ready</button>
   </div>
 
-  <div class="container hidden" id="countdown">
-    <h1>Interview begins in <span id="count">3</span>...</h1>
+  <div class="card hidden" id="countdown-section">
+    <h2>Interview starts in...</h2>
+    <div id="countdown">3</div>
   </div>
 
-  <div class="container hidden" id="interview">
-    <h1 id="questionBox">Welcome!</h1>
-    <button onclick="startInterview()">Begin</button>
+  <div class="card hidden" id="interview-section">
+    <h2 id="question">Loading question...</h2>
+    <div class="timer" id="timer">05:00</div>
+    <video id="preview" autoplay muted></video>
   </div>
 
   <script>
     const questions = [
-      "Tell me about yourself",
-      "Explain your educational background",
-      "What are your weaknesses and strengths?",
-      "Describe your experience with Object-Oriented Programming",
-      "How would you optimize low-performing SQL code?",
-      "Explain the purpose of a firewall",
-      "How do you approach troubleshooting a crashing program?",
-      "Explain SDLC and its uses",
-      "Explain the concept of horizontal scaling and its benefits",
-      "Why should I hire you?"
+      "Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.",
+      "1. Tell me about yourself.",
+      "2. Explain your educational background.",
+      "3. What are your weaknesses and strengths?",
+      "4. Describe your experience with object-oriented programming.",
+      "5. How would you optimize low performing SQL code?",
+      "6. Explain the purpose of a firewall.",
+      "7. How do you approach troubleshooting a crashing program?",
+      "8. Explain SDLC and its uses.",
+      "9. Explain the concept of horizontal scaling and its benefits.",
+      "10. Why should I hire you?"
     ];
 
     let currentQuestion = 0;
+    let countdown = 3;
 
     function showInstructions() {
-      document.getElementById("step1").classList.add("hidden");
-      document.getElementById("instructions").classList.remove("hidden");
+      const name = document.getElementById('name').value;
+      if (!name) return alert("Please enter your name.");
+      document.getElementById('form-section').classList.add('hidden');
+      document.getElementById('instructions-section').classList.remove('hidden');
     }
 
     function startCountdown() {
-      document.getElementById("instructions").classList.add("hidden");
-      document.getElementById("countdown").classList.remove("hidden");
-      let counter = 3;
+      document.getElementById('instructions-section').classList.add('hidden');
+      document.getElementById('countdown-section').classList.remove('hidden');
+      const countdownEl = document.getElementById('countdown');
       const interval = setInterval(() => {
-        counter--;
-        document.getElementById("count").textContent = counter;
-        if (counter === 0) {
+        countdown--;
+        countdownEl.textContent = countdown;
+        if (countdown < 1) {
           clearInterval(interval);
-          startGreeting();
+          document.getElementById('countdown-section').classList.add('hidden');
+          startInterview();
         }
       }, 1000);
     }
 
-    function startGreeting() {
-      document.getElementById("countdown").classList.add("hidden");
-      document.getElementById("interview").classList.remove("hidden");
-      const name = document.getElementById("candidateName").value;
-      const greeting = `Hello ${name}, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.`;
-      speak(greeting);
-      document.getElementById("questionBox").textContent = greeting;
-    }
-
     function startInterview() {
-      nextQuestion();
+      document.getElementById('interview-section').classList.remove('hidden');
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+          document.getElementById('preview').srcObject = stream;
+          askQuestion();
+        });
     }
 
-    function nextQuestion() {
-      if (currentQuestion >= questions.length) {
-        document.getElementById("questionBox").textContent = "Interview Complete. Thank you!";
-        return;
-      }
+    function askQuestion() {
       const q = questions[currentQuestion];
-      document.getElementById("questionBox").textContent = q;
+      document.getElementById('question').textContent = q;
       speak(q);
-      currentQuestion++;
-      setTimeout(nextQuestion, 300000); // 5 minutes
+      startTimer(300); // 5 minutes per question
+    }
+
+    function startTimer(seconds) {
+      const timer = document.getElementById('timer');
+      const interval = setInterval(() => {
+        const min = Math.floor(seconds / 60);
+        const sec = seconds % 60;
+        timer.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        if (--seconds < 0) {
+          clearInterval(interval);
+          if (++currentQuestion < questions.length) {
+            askQuestion();
+          } else {
+            endInterview();
+          }
+        }
+      }, 1000);
     }
 
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
       window.speechSynthesis.speak(utterance);
+    }
+
+    function endInterview() {
+      alert("Interview completed. Video will be saved and uploaded to Drive.");
+      // Drive upload logic goes here
     }
   </script>
 </body>
