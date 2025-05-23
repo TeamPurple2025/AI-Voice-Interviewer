@@ -3,194 +3,198 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Team Purple AI Interviewer</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+  <title>Team Purple AI Interview</title>
   <style>
     body {
-      font-family: 'Montserrat', sans-serif;
+      background-color: #121212;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #1a1a2e, #3f0071);
-      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-    }
-    header {
-      margin-top: 20px;
-      text-align: center;
-    }
-    header img {
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
     }
     .card {
-      background: #2c2c54;
-      padding: 2rem;
+      background: #1e1e2f;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(128, 0, 128, 0.4);
       margin-top: 20px;
-      border-radius: 2xl;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-      max-width: 600px;
       width: 90%;
-    }
-    h1, h2, p {
-      text-align: center;
-    }
-    input, select, button, textarea {
-      width: 100%;
-      padding: 0.8rem;
-      margin: 0.5rem 0;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+      max-width: 600px;
     }
     button {
       background-color: gold;
-      color: #3f0071;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      color: black;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 15px;
     }
-    .hidden {
-      display: none;
+    input, select {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      width: 100%;
     }
-    .timer {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-top: 1rem;
-      color: gold;
+    video {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Team Purple Logo">
-    <h1>Team Purple AI Interviewer</h1>
-  </header>
-
-  <div class="card" id="form-section">
+  <img src="logo.png" alt="Team Purple Logo" style="width: 100px; border-radius: 20px; margin-top: 20px;">
+  <div class="card">
     <h2>Candidate Details</h2>
-    <input type="text" id="name" placeholder="Full Name" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="tel" id="phone" placeholder="Phone Number" required>
-    <input type="file" id="resume" accept=".pdf,.doc,.docx">
+    <input type="text" id="name" placeholder="Your Name" />
+    <input type="email" id="email" placeholder="Your Email" />
+    <input type="tel" id="phone" placeholder="Your Phone Number" />
+    <input type="file" id="resume" accept=".pdf,.doc,.docx" />
     <select id="slot">
-      <option value="">-- Select Interview Slot --</option>
-      <option value="now">Continue Now</option>
-      <option value="9AM">9:00 AM</option>
-      <option value="11AM">11:00 AM</option>
-      <option value="2PM">2:00 PM</option>
+      <option value="">Select Interview Slot</option>
+      <option value="slot1">9:00 AM - 9:30 AM</option>
+      <option value="slot2">10:00 AM - 10:30 AM</option>
     </select>
     <button onclick="showInstructions()">Continue</button>
   </div>
 
-  <div class="card hidden" id="instructions-section">
-    <h2>Interview Instructions</h2>
-    <p><strong>Device & Environment:</strong> Use a laptop with webcam & mic in a quiet, well-lit room.</p>
-    <p><strong>No External Help:</strong> No phones, apps, or others present. Cheating disqualifies.</p>
-    <p><strong>AI Monitoring:</strong> Face, voice, and activity are monitored.</p>
-    <p><strong>Technical Setup:</strong> Test mic & webcam. Avoid switching tabs.</p>
-    <p><strong>Deadline:</strong> Complete the interview within the allotted time.</p>
-    <p>Warm regards,<br>Team Purple Recruitment Team</p>
-    <button onclick="startCountdown()">I'm Ready</button>
+  <div class="card" id="instructions" style="display: none">
+    <h3>Interview Instructions</h3>
+    <p>Use a laptop/desktop with webcam/mic.</p>
+    <p>No cheating or background help allowed.</p>
+    <p>Check your internet connection.</p>
+    <p>You will be disqualified if cheating is detected.</p>
+    <button onclick="startCountdown()">Start Interview</button>
   </div>
 
-  <div class="card hidden" id="countdown-section">
-    <h2>Interview starts in...</h2>
-    <div id="countdown">3</div>
+  <div class="card" id="countdown" style="display: none">
+    <h2>Interview begins in <span id="count">3</span>...</h2>
   </div>
 
-  <div class="card hidden" id="interview-section">
-    <h2 id="question">Loading question...</h2>
-    <div class="timer" id="timer">05:00</div>
+  <div class="card" id="interview" style="display: none">
+    <h3 id="question"></h3>
     <video id="preview" autoplay muted></video>
+    <button onclick="nextQuestion()">Next</button>
   </div>
 
   <script>
     const questions = [
-      "Hello, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.",
-      "1. Tell me about yourself.",
-      "2. Explain your educational background.",
-      "3. What are your weaknesses and strengths?",
-      "4. Describe your experience with object-oriented programming.",
-      "5. How would you optimize low performing SQL code?",
-      "6. Explain the purpose of a firewall.",
-      "7. How do you approach troubleshooting a crashing program?",
-      "8. Explain SDLC and its uses.",
-      "9. Explain the concept of horizontal scaling and its benefits.",
-      "10. Why should I hire you?"
+      "Tell me about yourself",
+      "Explain your educational background",
+      "What are your weaknesses and strengths?",
+      "Describe your experience with object-oriented programming",
+      "How would you optimize low performing SQL code?",
+      "Explain the purpose of a firewall",
+      "How do you approach troubleshooting a crashing program?",
+      "Explain SDLC and its uses",
+      "Explain horizontal scaling and its benefits",
+      "Why should I hire you?"
     ];
 
-    let currentQuestion = 0;
-    let countdown = 3;
+    let current = 0;
+    let recorder, stream;
 
     function showInstructions() {
-      const name = document.getElementById('name').value;
-      if (!name) return alert("Please enter your name.");
-      document.getElementById('form-section').classList.add('hidden');
-      document.getElementById('instructions-section').classList.remove('hidden');
+      document.querySelector('.card').style.display = 'none';
+      document.getElementById('instructions').style.display = 'block';
     }
 
     function startCountdown() {
-      document.getElementById('instructions-section').classList.add('hidden');
-      document.getElementById('countdown-section').classList.remove('hidden');
-      const countdownEl = document.getElementById('countdown');
+      document.getElementById('instructions').style.display = 'none';
+      document.getElementById('countdown').style.display = 'block';
+      let count = 3;
       const interval = setInterval(() => {
-        countdown--;
-        countdownEl.textContent = countdown;
-        if (countdown < 1) {
+        document.getElementById('count').innerText = count;
+        if (count === 1) {
           clearInterval(interval);
-          document.getElementById('countdown-section').classList.add('hidden');
           startInterview();
         }
+        count--;
       }, 1000);
     }
 
-    function startInterview() {
-      document.getElementById('interview-section').classList.remove('hidden');
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-          document.getElementById('preview').srcObject = stream;
-          askQuestion();
-        });
+    async function startInterview() {
+      document.getElementById('countdown').style.display = 'none';
+      document.getElementById('interview').style.display = 'block';
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      document.getElementById('preview').srcObject = stream;
+      recorder = new MediaRecorder(stream);
+      const chunks = [];
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const file = new File([blob], 'interview.webm');
+        uploadToDrive(file);
+      };
+      recorder.start();
+      speakGreeting();
+      askQuestion();
+    }
+
+    function speakGreeting() {
+      const name = document.getElementById('name').value;
+      const utter = new SpeechSynthesisUtterance(`Hello ${name}, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.`);
+      speechSynthesis.speak(utter);
     }
 
     function askQuestion() {
-      const q = questions[currentQuestion];
-      document.getElementById('question').textContent = q;
-      speak(q);
-      startTimer(300); // 5 minutes per question
+      document.getElementById('question').innerText = questions[current];
+      const utter = new SpeechSynthesisUtterance(questions[current]);
+      speechSynthesis.speak(utter);
     }
 
-    function startTimer(seconds) {
-      const timer = document.getElementById('timer');
-      const interval = setInterval(() => {
-        const min = Math.floor(seconds / 60);
-        const sec = seconds % 60;
-        timer.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-        if (--seconds < 0) {
-          clearInterval(interval);
-          if (++currentQuestion < questions.length) {
-            askQuestion();
-          } else {
-            endInterview();
-          }
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        askQuestion();
+      } else {
+        recorder.stop();
+        stream.getTracks().forEach(track => track.stop());
+        alert('Interview complete! Uploading to Drive...');
+      }
+    }
+
+    function uploadToDrive(file) {
+      const form = new FormData();
+      form.append("file", file);
+
+      const tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: "846135063061-mfo70maihl3vjbk75p4qr24tbdb9rii5.apps.googleusercontent.com",
+        scope: "https://www.googleapis.com/auth/drive.file",
+        callback: (tokenResponse) => {
+          fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${tokenResponse.access_token}`
+            },
+            body: createMultipartBody(file)
+          }).then(res => res.json()).then(console.log);
         }
-      }, 1000);
+      });
+      tokenClient.requestAccessToken();
     }
 
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      window.speechSynthesis.speak(utterance);
-    }
-
-    function endInterview() {
-      alert("Interview completed. Video will be saved and uploaded to Drive.");
-      // Drive upload logic goes here
+    function createMultipartBody(file) {
+      const boundary = 'foo_bar_baz';
+      const metadata = {
+        name: file.name,
+        mimeType: file.type
+      };
+      const delimiter = `--${boundary}`;
+      const close_delim = `--${boundary}--`;
+      const reader = new FileReader();
+      return new Blob([
+        `${delimiter}\nContent-Type: application/json; charset=UTF-8\n\n${JSON.stringify(metadata)}\n${delimiter}\nContent-Type: ${file.type}\n\n`,
+        file,
+        `\n${close_delim}`
+      ], { type: 'multipart/related; boundary=' + boundary });
     }
   </script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>
