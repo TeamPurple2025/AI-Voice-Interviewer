@@ -3,210 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Interview - Team Purple</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Montserrat:wght@500&display=swap"/>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background: #1a1a2e;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 20px;
-    }
-    .card {
-      background: #2e2e4d;
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 800px;
-      width: 100%;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-      text-align: center;
-    }
-    h1, h2 {
-      color: gold;
-    }
-    button {
-      background: #6a0dad;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      margin-top: 15px;
-    }
-    video {
-      width: 100%;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-    #timer {
-      font-size: 20px;
-      margin: 10px 0;
-    }
-  </style>
+  <title>Team Purple AI Interview</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="card">
-    <img src="logo.png" alt="Team Purple Logo" style="height: 80px; border-radius: 10px;"/>
-    <h1>Team Purple AI Interview</h1>
-    <div id="instructions">
+  <div class="container">
+    <img src="logo.png" alt="Team Purple Logo" class="logo" />
+    
+    <!-- Interview Instructions -->
+    <div id="instructions" class="card">
       <h2>Interview Instructions</h2>
-      <p><strong>Device & Environment:</strong><br>Use a laptop or desktop with webcam/mic. Be in a quiet and well-lit space.</p>
-      <p><strong>No External Help:</strong><br>No phones, chats, or people around. Cheating = disqualification.</p>
-      <p><strong>Technical Setup:</strong><br>Ensure mic works, stable internet, don’t switch tabs.</p>
-      <p><strong>Interview Link & Deadline:</strong><br>This link works only once. Finish before deadline.</p>
-      <p><strong>Contact:</strong><br>Reply to the original invite email if you face issues.</p>
-      <p><strong>Warm regards,<br>Team Purple Recruitment</strong></p>
-      <button onclick="startCountdown()">Continue</button>
+      <ul>
+        <li>✅ Use a laptop/desktop with webcam & microphone.</li>
+        <li>🔇 Ensure a quiet, well-lit room. No background noise.</li>
+        <li>🚫 Do not use phones, earphones, or messaging apps.</li>
+        <li>🧍 Be alone. No external help allowed.</li>
+        <li>⚠️ Voice, face, and tabs are monitored.</li>
+        <li>📶 Ensure strong internet connection.</li>
+        <li>📧 Complete before the deadline in your email.</li>
+      </ul>
+      <p><strong>Warm regards,<br>Team Purple<br>Recruitment Team</strong></p>
+      <button onclick="showCandidateForm()">Continue</button>
     </div>
 
-    <div id="countdown" style="display:none;">
-      <h2>Interview starts in <span id="count">3</span>...</h2>
+    <!-- Candidate Details Form -->
+    <div id="candidateForm" class="card hidden">
+      <h2>Candidate Details</h2>
+      <input type="text" id="candidateName" placeholder="Full Name" required />
+      <input type="email" id="candidateEmail" placeholder="Email Address" required />
+      <input type="tel" id="candidatePhone" placeholder="Phone Number" required />
+      <input type="file" id="resumeUpload" accept=".pdf,.doc,.docx" />
+      <button onclick="selectSlot()">Next</button>
     </div>
 
-    <div id="interview" style="display:none;">
-      <h2 id="questionBox"></h2>
-      <div id="timer">Time left: <span id="timeLeft">300</span> sec</div>
-      <video id="preview" autoplay muted></video>
+    <!-- Interview Slot or Continue Now -->
+    <div id="slotSelection" class="card hidden">
+      <h2>Select Interview Option</h2>
+      <button onclick="startCountdown()">Start Now</button>
+      <button disabled>📅 Schedule Slot (Coming Soon)</button>
+    </div>
+
+    <!-- Countdown before interview -->
+    <div id="countdownScreen" class="card hidden">
+      <h2>Interview begins in <span id="countdown">3</span>...</h2>
+    </div>
+
+    <!-- Actual Interview Screen -->
+    <div id="interviewScreen" class="card hidden">
+      <h2 id="questionText">Loading...</h2>
+      <video id="webcam" autoplay muted></video>
+      <p id="timer">⏱ 300 seconds remaining</p>
+      <button onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <!-- Final Summary -->
+    <div id="summaryScreen" class="card hidden">
+      <h2>Interview Complete</h2>
+      <div id="summaryList"></div>
+      <p>🎉 Thank you for completing the interview!</p>
     </div>
   </div>
 
-  <script>
-    const candidateName = localStorage.getItem('candidateName') || 'Candidate';
-    const questions = [
-      "Tell me about yourself",
-      "Explain your educational background",
-      "What are your weaknesses and strengths?",
-      "Describe your experience with object-oriented programming.",
-      "How would you optimize low-performing SQL code?",
-      "Explain the purpose of a firewall.",
-      "How do you approach troubleshooting a crashing program?",
-      "Explain SDLC and its uses.",
-      "Explain the concept of horizontal scaling and its benefits.",
-      "Why should I hire you?"
-    ];
-    let currentQuestion = 0;
-    let timeLeft = 300;
-    let timer;
-    let mediaRecorder;
-    let recordedChunks = [];
-
-    function startCountdown() {
-      document.getElementById('instructions').style.display = 'none';
-      document.getElementById('countdown').style.display = 'block';
-      let count = 3;
-      const countdown = setInterval(() => {
-        count--;
-        document.getElementById('count').innerText = count;
-        if (count === 0) {
-          clearInterval(countdown);
-          document.getElementById('countdown').style.display = 'none';
-          startInterview();
-        }
-      }, 1000);
-    }
-
-    async function startInterview() {
-      document.getElementById('interview').style.display = 'block';
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById('preview').srcObject = stream;
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = e => {
-          if (e.data.size > 0) recordedChunks.push(e.data);
-        };
-        mediaRecorder.onstop = uploadToDrive;
-        mediaRecorder.start();
-        greetAndAsk();
-      } catch (err) {
-        alert('Could not access camera/mic. Please refresh and allow permissions.');
-      }
-    }
-
-    function speak(text, callback) {
-      const synth = window.speechSynthesis;
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.voice = synth.getVoices().find(v => v.lang === 'en-US');
-      utter.onend = callback;
-      synth.speak(utter);
-    }
-
-    function greetAndAsk() {
-      speak(`Hello ${candidateName}, I am Team Purple AI Interviewer. We are sorry for the inconvenience caused by taking re-interviews due to an emergency. Let's start the interview.`, askQuestion);
-    }
-
-    function askQuestion() {
-      if (currentQuestion >= questions.length) {
-        stopInterview();
-        return;
-      }
-      document.getElementById('questionBox').innerText = `${currentQuestion + 1}. ${questions[currentQuestion]}`;
-      speak(questions[currentQuestion]);
-      timeLeft = 300;
-      updateTimer();
-      timer = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timeLeft').innerText = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          currentQuestion++;
-          askQuestion();
-        }
-      }, 1000);
-    }
-
-    function stopInterview() {
-      clearInterval(timer);
-      mediaRecorder.stop();
-      document.getElementById('questionBox').innerText = "Interview Complete. Uploading your response...";
-    }
-    function uploadToDrive() {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      const file = new File([blob], `Interview_${candidateName}_${Date.now()}.webm`, { type: 'video/webm' });
-
-      const metadata = {
-        name: file.name,
-        mimeType: file.type
-      };
-
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      form.append('file', file);
-
-      fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: new Headers({ 'Authorization': 'Bearer ' + gapi.auth.getToken().access_token }),
-        body: form
-      })
-      .then(response => response.json())
-      .then(file => {
-        document.getElementById('questionBox').innerText = 'Interview complete. Video uploaded to Google Drive.';
-        showSummary();
-      })
-      .catch(err => {
-        document.getElementById('questionBox').innerText = 'Upload failed. Please try again.';
-        console.error('Upload error:', err);
-      });
-    }
-
-    function showSummary() {
-      const summary = questions.map((q, i) => `${i + 1}. ${q}`).join('<br>');
-      document.getElementById('interview').innerHTML = `
-        <h2>Interview Summary</h2>
-        <p><strong>Candidate:</strong> ${candidateName}</p>
-        <p><strong>Email:</strong> ${candidateEmail}</p>
-        <p><strong>Phone:</strong> ${candidatePhone}</p>
-        <p><strong>Questions:</strong><br>${summary}</p>
-        <p>Your responses have been recorded and submitted. Thank you!</p>
-      `;
-    }
-  </script>
-
+  <script src="interview.js"></script>
 </body>
 </html>
