@@ -1,1 +1,36 @@
-<!-- index.html -->...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Purple | AI Voice Interview</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="interview.js"></script>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="Team Purple Logo" class="logo" />
+    <div id="instructions" class="card">
+      <h2>Interview Instructions</h2>
+      <ul>
+        <li>Use a laptop/desktop with webcam & microphone.</li>
+        <li>Ensure a quiet, well-lit room. No background noise.</li>
+        <li>Do not use phones, earphones, or messaging apps.</li>
+        <li>Be alone. No external help allowed.</li>
+        <li>Voice, face, and tabs are monitored.</li>
+        <li>Ensure strong internet connection.</li>
+        <li>Complete before the deadline in your email.</li>
+      </ul>
+      <p>Warm regards,<br><strong>Team Purple Recruitment Team</strong></p>
+      <button id="continueBtn">Continue</button>
+    </div>
+
+    <div id="candidateForm" class="card hidden">
+      <h2>Candidate Details</h2>
+      <input type="text" id="fullName" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <button id="startInterviewBtn">Start Interview</button>
+    </div>
+  </div>
+</body>
+</html>
