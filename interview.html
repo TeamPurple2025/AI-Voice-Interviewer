@@ -3,83 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Team Purple Interview</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>AI Interview</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" class="logo" alt="Logo" />
-    <div class="card">
-      <h2 id="greeting">Welcome, Candidate</h2>
-      <div id="questionBox">
-        <h3 id="question">Loading question...</h3>
-        <p id="timer">⏳ 300s</p>
-        <button id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
-      </div>
+    <div id="instructions" class="card">
+      <h2>Interview Instructions</h2>
+      <ul>
+        <li>✅ Use a laptop with webcam and mic</li>
+        <li>✅ Ensure strong internet</li>
+        <li>✅ No background apps, no cheating</li>
+        <li>✅ Stay in one tab, and speak clearly</li>
+        <li>✅ No external help allowed</li>
+        <li>✅ Interview is monitored (video, audio, screen)</li>
+      </ul>
+      <button onclick="showForm()">Continue</button>
+    </div>
+
+    <div id="registration" class="card hidden">
+      <h2>Candidate Details</h2>
+      <input type="text" id="fullName" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <button onclick="startInterview()">Start Interview</button>
+    </div>
+
+    <div id="interview" class="card hidden">
+      <h2 id="questionTitle">Question 1</h2>
+      <p id="questionText"></p>
+      <p id="timer">Time Remaining: <span id="countdown">300</span> sec</p>
+      <button onclick="nextQuestion()">Next</button>
+    </div>
+
+    <div id="summary" class="card hidden">
+      <h2>Interview Complete!</h2>
+      <p>Thank you for attending, <span id="candidateName"></span>.</p>
     </div>
   </div>
 
-  <script>
-    const name = sessionStorage.getItem("candidateName") || "Candidate";
-    const email = sessionStorage.getItem("candidateEmail") || "";
-    document.getElementById("greeting").innerText = "Welcome, " + name;
-
-    const questions = [
-      "Explain the difference between HTTP and HTTPS.",
-      "What is a closure in JavaScript?",
-      "Describe how a REST API works.",
-      "How does async/await work in JS?",
-      "Explain time complexity with an example.",
-      "What is the purpose of Docker?",
-      "What is the difference between SQL and NoSQL?",
-      "Explain the concept of promises in JS.",
-      "What is the use of Git branches?",
-      "How would you optimize a website for performance?"
-    ];
-
-    let current = 0;
-    let timeLeft = 300;
-    let timerInterval;
-
-    function speak(text) {
-      const synth = window.speechSynthesis;
-      const utter = new SpeechSynthesisUtterance(text);
-      synth.speak(utter);
-    }
-
-    function showQuestion(index) {
-      if (index >= questions.length) {
-        document.getElementById("question").innerText = "Interview Complete. Thank you!";
-        document.getElementById("timer").style.display = "none";
-        document.getElementById("nextBtn").style.display = "none";
-        return;
-      }
-
-      const q = questions[index];
-      document.getElementById("question").innerText = q;
-      speak(q);
-      timeLeft = 300;
-      document.getElementById("nextBtn").disabled = true;
-
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        document.getElementById("timer").innerText = `⏳ ${timeLeft}s`;
-        timeLeft--;
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          document.getElementById("nextBtn").disabled = false;
-        }
-      }, 1000);
-    }
-
-    function nextQuestion() {
-      current++;
-      showQuestion(current);
-    }
-
-    window.onload = () => {
-      showQuestion(0);
-    };
-  </script>
+  <script src="interview.js"></script>
 </body>
 </html>
