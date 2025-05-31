@@ -2,41 +2,172 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interview Instructions</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Voice Interview - Instructions</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d0b21;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #1e1b3a;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px gold;
+    }
+    video {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .input-group {
+      margin: 15px 0;
+      text-align: left;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: gold;
+      color: black;
+      padding: 12px 25px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
+
   <div class="container">
-    <img src="logo.png" class="logo" />
-    <div class="card">
-      <h2>Interview Instructions</h2>
-      <ul>
-        <li>Use a laptop/desktop with webcam & microphone.</li>
-        <li>Ensure a quiet, well-lit room. No background noise.</li>
-        <li>Do not use phones, earphones, or messaging apps.</li>
-        <li>Be alone. No external help allowed.</li>
-        <li>Voice, face, and tabs are monitored.</li>
-        <li>Ensure strong internet connection.</li>
-        <li>Complete before the deadline in your email.</li>
+    <h2>🎙️ Welcome to Your AI Interview</h2>
+    <p id="greeting">Hello Candidate!</p>
+
+    <video id="video" autoplay muted></video>
+
+    <p id="instructions">
+      Please listen carefully. You must:
+      <ul style="text-align:left;">
+        <li>Use a desktop or laptop with webcam and microphone</li>
+        <li>Ensure a quiet, well-lit room</li>
+        <li>Be alone and avoid external help</li>
+        <li>Stay focused, as your face, voice, and tabs are monitored</li>
+        <li>Upload your resume and complete before your deadline</li>
       </ul>
-      <p>Warm regards,<br><strong>Team Purple Recruitment Team</strong></p>
-      <button id="continueBtn">Continue</button>
-    </div>
+    </p>
+
+    <form id="form">
+      <div class="input-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" required />
+      </div>
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="input-group">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" required />
+      </div>
+      <div class="input-group">
+        <label for="resume">Upload Resume</label>
+        <input type="file" id="resume" accept=".pdf,.doc,.docx" required />
+      </div>
+
+      <button type="submit">Continue</button>
+      <div id="error"></div>
+    </form>
   </div>
 
   <script>
-    document.getElementById("continueBtn").onclick = function () {
+    async function startVideo() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById("video").srcObject = stream;
+      } catch (err) {
+        document.getElementById("error").innerText = "⚠️ Please allow camera and mic access!";
+      }
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      speechSynthesis.speak(utterance);
+    }
+
+    async function validateToken(token) {
+      const res = await fetch("interview-tokens.json");
+      const data = await res.json();
+      return data.includes(token);
+    }
+
+    async function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get("token");
 
-      // Redirect with token
-      if (token) {
-        window.location.href = `interview.html?token=${token}`;
-      } else {
-        alert("Access token missing. Please use your invite link.");
+      if (!(await validateToken(token))) {
+        document.querySelector("form").remove();
+        document.getElementById("greeting").innerText = "❌ Invalid or missing token. Contact support.";
+        return;
       }
-    };
+
+      // Greet the candidate
+      const name = token;
+      const greetMessage = `Hello ${name}, welcome to the Team Purple AI interview platform. Please follow the instructions carefully.`;
+      document.getElementById("greeting").innerText = greetMessage;
+      speak(greetMessage);
+
+      // Speak instructions
+      const instructions =
+        "Use a laptop or desktop with camera and microphone. Ensure a quiet, well-lit room. Be alone with no help. Avoid switching tabs. Upload your resume and begin on time.";
+      speak(instructions);
+
+      startVideo();
+
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const cname = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const resume = document.getElementById("resume").files[0];
+
+        if (!cname || !email || !phone || !resume) {
+          document.getElementById("error").innerText = "⚠️ Please fill all fields and upload resume.";
+          return;
+        }
+
+        sessionStorage.setItem("candidateName", cname);
+        sessionStorage.setItem("candidateEmail", email);
+        sessionStorage.setItem("candidatePhone", phone);
+
+        window.location.href = `interview.html?token=${token}`;
+      });
+    }
+
+    window.onload = init;
   </script>
+
 </body>
 </html>
