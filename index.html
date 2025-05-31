@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Team Purple | AI Voice Interview</title>
+  <title>Interview Instructions</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="interview.js"></script>
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="Team Purple Logo" class="logo" />
-    <div id="instructions" class="card">
+    <img src="logo.png" class="logo" />
+    <div class="card">
       <h2>Interview Instructions</h2>
       <ul>
         <li>Use a laptop/desktop with webcam & microphone.</li>
@@ -24,13 +23,20 @@
       <p>Warm regards,<br><strong>Team Purple Recruitment Team</strong></p>
       <button id="continueBtn">Continue</button>
     </div>
-
-    <div id="candidateForm" class="card hidden">
-      <h2>Candidate Details</h2>
-      <input type="text" id="fullName" placeholder="Full Name" required />
-      <input type="email" id="email" placeholder="Email Address" required />
-      <button id="startInterviewBtn">Start Interview</button>
-    </div>
   </div>
+
+  <script>
+    document.getElementById("continueBtn").onclick = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+
+      // Redirect with token
+      if (token) {
+        window.location.href = `interview.html?token=${token}`;
+      } else {
+        alert("Access token missing. Please use your invite link.");
+      }
+    };
+  </script>
 </body>
 </html>
