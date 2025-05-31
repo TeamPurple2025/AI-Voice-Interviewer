@@ -3,69 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Team Purple AI Interview</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <title>Team Purple Interview</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="Team Purple Logo" class="logo" />
-    
-    <!-- Interview Instructions -->
-    <div id="instructions" class="card">
-      <h2>Interview Instructions</h2>
-      <ul>
-        <li>✅ Use a laptop/desktop with webcam & microphone.</li>
-        <li>🔇 Ensure a quiet, well-lit room. No background noise.</li>
-        <li>🚫 Do not use phones, earphones, or messaging apps.</li>
-        <li>🧍 Be alone. No external help allowed.</li>
-        <li>⚠️ Voice, face, and tabs are monitored.</li>
-        <li>📶 Ensure strong internet connection.</li>
-        <li>📧 Complete before the deadline in your email.</li>
-      </ul>
-      <p><strong>Warm regards,<br>Team Purple<br>Recruitment Team</strong></p>
-      <button onclick="showCandidateForm()">Continue</button>
-    </div>
-
-    <!-- Candidate Details Form -->
-    <div id="candidateForm" class="card hidden">
-      <h2>Candidate Details</h2>
-      <input type="text" id="candidateName" placeholder="Full Name" required />
-      <input type="email" id="candidateEmail" placeholder="Email Address" required />
-      <input type="tel" id="candidatePhone" placeholder="Phone Number" required />
-      <input type="file" id="resumeUpload" accept=".pdf,.doc,.docx" />
-      <button onclick="selectSlot()">Next</button>
-    </div>
-
-    <!-- Interview Slot or Continue Now -->
-    <div id="slotSelection" class="card hidden">
-      <h2>Select Interview Option</h2>
-      <button onclick="startCountdown()">Start Now</button>
-      <button disabled>📅 Schedule Slot (Coming Soon)</button>
-    </div>
-
-    <!-- Countdown before interview -->
-    <div id="countdownScreen" class="card hidden">
-      <h2>Interview begins in <span id="countdown">3</span>...</h2>
-    </div>
-
-    <!-- Actual Interview Screen -->
-    <div id="interviewScreen" class="card hidden">
-      <h2 id="questionText">Loading...</h2>
-      <video id="webcam" autoplay muted></video>
-      <p id="timer">⏱ 300 seconds remaining</p>
-      <button onclick="nextQuestion()">Next Question</button>
-    </div>
-
-    <!-- Final Summary -->
-    <div id="summaryScreen" class="card hidden">
-      <h2>Interview Complete</h2>
-      <div id="summaryList"></div>
-      <p>🎉 Thank you for completing the interview!</p>
+    <img src="logo.png" class="logo" alt="Logo" />
+    <div class="card">
+      <h2 id="greeting">Welcome, Candidate</h2>
+      <div id="questionBox">
+        <h3 id="question">Loading question...</h3>
+        <p id="timer">⏳ 300s</p>
+        <button id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+      </div>
     </div>
   </div>
 
-  <script src="interview.js"></script>
-<script src="interview.js" defer></script>
+  <script>
+    const name = sessionStorage.getItem("candidateName") || "Candidate";
+    const email = sessionStorage.getItem("candidateEmail") || "";
+    document.getElementById("greeting").innerText = "Welcome, " + name;
+
+    const questions = [
+      "Explain the difference between HTTP and HTTPS.",
+      "What is a closure in JavaScript?",
+      "Describe how a REST API works.",
+      "How does async/await work in JS?",
+      "Explain time complexity with an example.",
+      "What is the purpose of Docker?",
+      "What is the difference between SQL and NoSQL?",
+      "Explain the concept of promises in JS.",
+      "What is the use of Git branches?",
+      "How would you optimize a website for performance?"
+    ];
+
+    let current = 0;
+    let timeLeft = 300;
+    let timerInterval;
+
+    function speak(text) {
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance(text);
+      synth.speak(utter);
+    }
+
+    function showQuestion(index) {
+      if (index >= questions.length) {
+        document.getElementById("question").innerText = "Interview Complete. Thank you!";
+        document.getElementById("timer").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        return;
+      }
+
+      const q = questions[index];
+      document.getElementById("question").innerText = q;
+      speak(q);
+      timeLeft = 300;
+      document.getElementById("nextBtn").disabled = true;
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        document.getElementById("timer").innerText = `⏳ ${timeLeft}s`;
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("nextBtn").disabled = false;
+        }
+      }, 1000);
+    }
+
+    function nextQuestion() {
+      current++;
+      showQuestion(current);
+    }
+
+    window.onload = () => {
+      showQuestion(0);
+    };
+  </script>
 </body>
 </html>
