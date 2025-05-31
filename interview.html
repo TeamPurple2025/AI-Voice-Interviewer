@@ -1,1 +1,87 @@
-<!-- interview.html -->...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interview - Team Purple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" class="logo" alt="Team Purple Logo" />
+    <div class="card" id="questionBox">
+      <h2 id="greetingTitle">Hi Candidate!</h2>
+      <p id="questionText">Loading...</p>
+      <p id="timer">Time left: <span id="timeLeft">300</span> sec</p>
+      <button id="nextQuestionBtn">Next Question</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      "Tell me about yourself",
+      "Explain your educational background",
+      "What are your weaknesses and strengths?",
+      "Describe your experience with object-oriented programming",
+      "How would you optimize low-performing SQL code?",
+      "Explain the purpose of a firewall",
+      "How do you approach troubleshooting a crashing program?",
+      "Explain SDLC and its uses",
+      "Explain the concept of horizontal scaling and its benefits",
+      "Why should I hire you?"
+    ];
+
+    let currentQuestion = 0;
+    let timerInterval;
+    const timePerQuestion = 300;
+    let timeLeft = timePerQuestion;
+
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "Candidate";
+
+    document.getElementById("greetingTitle").innerText = `Hi ${name}, your interview begins`;
+
+    function startTimer() {
+      timeLeft = timePerQuestion;
+      document.getElementById("timeLeft").innerText = timeLeft;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timeLeft").innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          nextQuestion();
+        }
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      if (currentQuestion >= questions.length) {
+        document.getElementById("questionText").innerText = "Interview complete. Thank you!";
+        document.getElementById("nextQuestionBtn").style.display = "none";
+        clearInterval(timerInterval);
+        return;
+      }
+      document.getElementById("questionText").innerText = questions[currentQuestion];
+      startTimer();
+      speak(questions[currentQuestion]);
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      loadQuestion();
+    }
+
+    document.getElementById("nextQuestionBtn").addEventListener("click", nextQuestion);
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
